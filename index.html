@@ -1,12 +1,65 @@
 <!DOCTYPE html>
 <html>
+<style type="text/css">
+
+html, body {
+  background-image: url(' BgCovid.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed; 
+  background-size: 100% 100%;
+  color: white;
+}
+
+</style>
 <head>
 	<meta charset="utf-8">
 	<title>COVID-19 vaccination in India</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 </head>
 <body>
-<marquee>
-COVID-19 vaccination in India
-</marquee>
+<marquee style="color: white;"><h1>COVID-19 vaccination in India</h1></marquee>
+<div id="JasonSelectTxtDiv"></div>
+<div id="JasonTxtDiv"></div>
+
+Districts Count <input type="text" name="JasonText" id="JasonTxtBox">
 </body>
+<script type="text/javascript">
+	/*$.getJSON("https://cdn-api.co-vin.in/api/v2/admin/location/districts/31", function(result){
+		console.log(result)
+	});*/
+	$.ajax({
+        type: "GET",
+        url: 'https://cdn-api.co-vin.in/api/v2/admin/location/districts/31',
+        contentType: "application/json; charset=utf-8",
+        cache: false,
+        success:function(res){console.log(res);AddDiv(res)},
+    });
+
+function AddDiv(data){
+$("#JasonTxtBox").val(data.districts.length);
+AddDrpvalues(data.districts);
+}
+function ChangeVal()
+{
+    var selectedValue = $( "#DistrictDrpdown option:selected" ).text();
+    $("#JasonSelectTxtDiv").text("The Selected District is "+ selectedValue)
+}
+function AddDrpvalues(data)
+{
+	var html="";
+	html+="<select id='DistrictDrpdown' onChange='ChangeVal();'>";
+
+	for (i = 0; i < data.length; i++) {
+	html+="<option value='"+data[i].district_id+"'>"+data[i].district_name+"</option>";
+	}
+	/*data.foreach(function (el,ind){
+	html+="<option value='"+el.district_id+"'>'"+el.district_name+"'</option>";
+	});*/
+
+	html+="</select>";
+	$("#JasonTxtDiv").append(html);
+
+}
+</script>
 </html>
