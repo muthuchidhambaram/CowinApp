@@ -4,75 +4,26 @@
 	#View{
 	padding: 15px 0px;
 	}
-html {    
-    background: url('BackImage.jpg') no-repeat center fixed;     
-    background-size: cover;
-}
-	body {
-	font-size: 1rem !important;
-	background-color: transparent !important;
-	}
-	.tableFixHead  {
-	overflow: auto;
-	max-height: 500px;
 
-	}
-	.tableFixHead thead  { 
-		position: -webkit-sticky;
-	position: sticky; 
-	top: 0;
-	z-index: 1; 
-	}
-	.covin-img{
-	background-image: url(BackImage.jpg);
-	background-position: center;
-	background-attachment: fixed;
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	position: relative;
-	color: white;
-	}
-.borderless td, .borderless th {
-    border: none !important;
-}
-	.gold-color{
-background: linear-gradient(120deg, #1798c1, #ff1100);
-
-		/*background: radial-gradient(ellipse at center, #e0b520 0%,#1f1c1a 100%) !important;*/
-	}
-	.gold-plated-color{
-		background: linear-gradient(to bottom, #82f3ff 26%, #24e6d4 27%,#0f6b62 78%) !important;
-		color: white ;
-		/*background:linear-gradient(to bottom, #cfc09f 26%, #cfc09f 27%,#ffecb3 78%) !important;*/
-	}
-
-	.loader {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
+.filterpanel{
+padding: 5px;
+margin: 5px;	  
 }
 
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+
 </style>
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 	<title>COVID-19 vaccination in India</title>
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
+<link rel="stylesheet" type="text/css" href="scrollbar.css" />
+<link rel="stylesheet" type="text/css" href="card.css" />
+<link rel="stylesheet" type="text/css" href="table.css" />
 
 <!-- Optional theme -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
@@ -96,7 +47,11 @@ background: linear-gradient(120deg, #1798c1, #ff1100);
 	var selectedDate;
 	var model={};
 	model.DistrictInfo=[];
+	model.BlockName=[];
 	var selectedDistrict;
+	var selectedFilter;
+	var selectedBlock;
+	var CenterCount;
 	function AjaxCall(APIUrl)
 	{
 		/*$.getJSON("https://cdn-api.co-vin.in/api/v2/admin/location/districts/31", function(result){console.log(result)});*/
@@ -138,21 +93,48 @@ function onDropdownChange(e)
     {
     	model[name].forEach(function (el,i){
     	el.selected=(index==i);	
-    	})
+    	});
     	selectedDistrict=model[name][index].district_id;
 	getDistrictInformation();
+	
+	selectedBlock='';
     }
-    
-// var Districtdata=AjaxCall("https://cdn-api.co-vin.in/api/v2/admin/location/districts/"+selectedValue);
-// AjaxCall("https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id="+selectedValue+"&date="+selectedDate+"');
-// AddDrpvalues(data.sessions,)
+    if(name=='BlockName'){
+    	model[name].forEach(function (el,i){
+    	el.selected=(index==i);	
+    	});
+    	 selectedBlock=model[name][index].block_name;
+    	 render();
+    }
+			
+
 }
 
 function getDistrictInformation(){
 var DistrictInfo=AjaxCall('https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id='+selectedDistrict+'&date='+selectedDate);
 	model.DistrictInfo=DistrictInfo.sessions;
+	getBlockInformation();
 	render();
 }
+function getBlockInformation(){
+	model.BlockName=[];
+	 if(model.DistrictInfo.length>0){
+			var Blocklist=[];
+		model.DistrictInfo.forEach(function(e){
+			var obj={};
+			obj=e.block_name;
+			if(!Blocklist.includes(obj))
+				Blocklist.push(obj);
+	});
+		Blocklist.forEach(function (el){
+			var obj={};
+			obj.block_name=el;
+			model.BlockName.push(obj);
+		})
+	}
+	render();
+}
+
 
 function onGenerateDropdown(data,name,id,text)
 {
@@ -162,13 +144,26 @@ function onGenerateDropdown(data,name,id,text)
 	html+='<option value="0">Choose '+name+'</option>';
 	if(data.length>0)
 	{
-		data.forEach(function (e,ind){
+		if(name=='Districts')
+		{
+			data.forEach(function (e,ind){
+				var selected=e.selected?'selected':'';
+			html+='<option value="'+ind+'" '+selected+'>'+e[text]+'</option>';
+			});
+			
+		}
+		if(name=='BlockName')
+		{
+			data.forEach(function (e,ind){
 			var selected=e.selected?'selected':'';
-		html+='<option value="'+ind+'" '+selected+'>'+e[text]+'</option>';
+			// html+='<option value="'+ind+'" '+selected+'>'+e+'</option>';
+			html+='<option value="'+ind+'" '+selected+'>'+e[text]+'</option>';
+
 		});
+		}
 	}
 	html+='</select>';
-	html+='<label for="floatingSelect">Select District</label>';
+	html+='<label for="floatingSelect">Select '+name+'</label>';
 	html+='</div>';
 	return html;
 }
@@ -207,26 +202,143 @@ function onGenerateGrid(data)
 	return html;
 	
 }
-function render(){
-	var html='';
-		html+='<div class="row">';
-			html+='<div class="col-lg-offset-10 col-md-offset-10 col-lg-2 col-md-2 col-sm-12 .col-xs-12">';
-				html+=onGenerateDropdown(model.Districts,'Districts','DistrictDrpdown','district_name');
-			html+='</div>';	
 
-		html+='</div><br>';
-			html+='<div class="row">';
-				html+='<div class="col-sm-12">';
-					html+='<div class=" tableFixHead">';
-					html+=onGenerateGrid(model.DistrictInfo);
+function onGenerateCard(data)
+{
+	var html='';
+	if(data.length>0)
+	{
+		data.forEach(function (e){
+			// if (e.available_capacity>0)
+			// {
+				if(SelectFilter(e))
+				{
+			var feeclass=e.fee_type=="Paid"?'fee-type-paid':'fee-type-free';
+			var ageclass=e.min_age_limit===45?'age-max':'age-mid';
+			var fee=e.fee_type=="Paid"?'₹'+e.fee:'';
+			var age=e.min_age_limit===45?'45+':'18-44';
+
+			html+='<div class="column">';
+				html+='<div class="card" >';
+					html+='<div class="row clearfix">';
+						html+='<h5 class="center-name">'+e.name.toUpperCase()+'</h5>';
+							html+='<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 center-address" >';
+								html+='<p>'+e.address.toLowerCase()+'</p>';
+							html+='</div>';
+							html+='<div class="col-lg-4 col-md-6 col-sm-4 col-xs-6 fee-panel">';
+								html+='<h6>'+e.vaccine+' '+fee+'</h6>';
+								html+='<p class="'+feeclass+'">'+e.fee_type+'</p>';
+							html+='</div>';
+								html+='<div class="col-lg-4 col-md-6 col-sm-4 col-xs-6 age-panel">';
+									html+='<p class="'+ageclass+'"> Age '+age+'</p>';
+								html+='</div>';
+
+								html+='<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">';
+									html+='<p><span class="dosage">Dosage1 : <b>'+e.available_capacity_dose1+'</b></span>';
+									html+='<span class="dosage">Dosage2 : <b> '+e.available_capacity_dose2+'</b></span></p>';
+								html+='</div>';
+							// html+='<div class="row">';
+								e.slots.forEach(function(el){
+									var eltime=el.split('-');
+								 html+='<span class="slot-time"><timer>'+eltime[0]+'</timer>-<timer>'+eltime[1]+'</timer></span>';
+								});
+							// html+='</div>';
 					html+='</div>';
 				html+='</div>';
 			html+='</div>';
+		}
+	// }
+		});
+	}
+
+
+
+	return html;
+	
+}
+function SelectFilter(e){
+	var sts=false;
+	if($("#BlockDrpdown").val()!="0")
+	{
+		switch(selectedBlock){
+			case undefined:case "":
+			sts=true;
+			break;
+		}
+	}
+
+	switch(selectedFilter){
+		case undefined:case "":
+		sts=true;
+		break;
+	}
+	switch(e.fee_type){
+		case selectedFilter:
+		sts=true;
+		break;
+	}
+	switch(e.block_name){
+		case selectedBlock:
+		sts=true;
+		break;
+	}
+	switch(e.min_age_limit.toString()){
+		case selectedFilter:
+		sts=true;
+		break;
+	}
+	return sts;
+}
+
+function render(){
+	var html='';
+		html+='<div class="row ">';
+			html+='<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 filterpanel">';
+				html+=onGenerateDropdown(model.Districts,'Districts','DistrictDrpdown','district_name');
+			html+='</div>';	
+			html+='<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 filterpanel">';
+				html+=onGenerateDropdown(model.BlockName,'BlockName','BlockDrpdown','block_name');
+			html+='</div>';	
+			html+='<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 filterpanel">';
+			html+='<div class="form-floating" >';
+			html+='<input type="date" id="Datepicker" class="form-select" name="Datepick">';
+			html+='<label for="floatingSelect">Date</label>';
+			html+='</div>';
+			html+='</div>';	
+			html+='<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 filterpanel filternavpanel">';
+			html+='<ul class="nav nav-pills">';
+			html+='<li class="navfilterpanel"><a data-toggle="pill">Age 18+</a></li>';
+			html+='<li class="navfilterpanel"><a data-toggle="pill">Age 45+</a></li>';
+			html+='<li class="navfilterpanel"><a data-toggle="pill">Free</a></li>';
+			html+='<li class="navfilterpanel"><a data-toggle="pill">Paid</a></li>';
+			html+=' </ul>';
+			html+='</div>';	
+				html+='<div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 filterpanel">';
+			html+='<span class="center-count"></span>';
+			html+='</div>';	
+		html+='</div><br>';
+
+		html+='<div class="row center-details">';
+		html+=onGenerateCard(model.DistrictInfo);
+		html+='</div>';
+		// html+='<div class="row">';
+		// 	html+='<div class="col-sm-12">';
+		// 		html+='<div class=" tableFixHead">';
+		// 		html+=onGenerateGrid(model.DistrictInfo);
+		// 		html+='</div>';
+		// 	html+='</div>';
+		// html+='</div>';
 	$("#View").empty().append(html);
 
 	$('.mc-dropdown').on('change',onDropdownChange);
-
-
+	$('.navfilterpanel').on('click',onFilterPanelChange);
+	CenterCount=$('.center-details > div').length;
+	$('.center-count').text(CenterCount);
+}
+function onFilterPanelChange(){
+selectedFilter=this.innerText;
+selectedFilter=selectedFilter.replace("Age","").replace("' '","").replace("+","").trim();
+render();
 }
 function getDistrictData(stateId){
 	var districtsData=AjaxCall("https://cdn-api.co-vin.in/api/v2/admin/location/districts/"+stateId);
@@ -244,18 +356,9 @@ function convertDate(inputDate) {function pad(s)
 
 function load(){
 	getDistrictData(31);
-	selectedDate=convertDate(new Date());
-
-$(window).load(function() {
-	$(".loader").animate({
-				top: -200
-			}, 1500);
-});
+	selectedDate=$('#Datepicker').val()!=""?convertDate($('#Datepicker').val()):convertDate(new Date());
 }
 
-$(document).ready(
-	load
-
-	);
+$(document).ready(load);
 </script>
 </html>
