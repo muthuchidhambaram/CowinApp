@@ -1,0 +1,27 @@
+	.tableFixHead  {
+	overflow: auto;
+	max-height: 500px;
+
+	}
+	.tableFixHead thead  { 
+	position: -webkit-sticky;
+	position: sticky; 
+	top: 0;
+	z-index: 1; 
+	}
+	.gold-color{
+	background: linear-gradient(120deg, #1798c1, #ff1100);
+
+	/*background: radial-gradient(ellipse at center, #e0b520 0%,#1f1c1a 100%) !important;*/
+	}
+	.gold-plated-color{
+	background: linear-gradient(to bottom, #82f3ff 26%, #24e6d4 27%,#0f6b62 78%) !important;
+	color: white ;
+	/*background:linear-gradient(to bottom, #cfc09f 26%, #cfc09f 27%,#ffecb3 78%) !important;*/
+	}
+	.borderless td, .borderless th {
+	border: none !important;
+	}
+	.center-name{
+		margin: 20px 0px;
+	}
