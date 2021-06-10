@@ -126,7 +126,7 @@ body {
 
 }
 .dosage{
-margin: 5px;
+margin: 2px;
 padding: 1px;
 }
 .center-count{
@@ -149,4 +149,9 @@ padding: 1px;
 }
 .filternavpanel{
   background: #fbf9f9;
+}
+.slotsheader
+{
+  cursor: pointer;
+  
 }
