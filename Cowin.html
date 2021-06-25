@@ -212,8 +212,8 @@ function onGenerateCard(data)
 	if(data.length>0)
 	{
 		data.forEach(function (e){
-			// if (e.available_capacity>0)
-			// {
+			 if (e.available_capacity>0)
+			 {
 				if(SelectFilter(e))
 				{
 			var feeclass=e.fee_type=="Paid"?'fee-type-paid':'fee-type-free';
@@ -261,7 +261,7 @@ function onGenerateCard(data)
 				html+='</div>';
 			html+='</div>';
 		}
-	// }
+	 }
 		});
 	}
 
