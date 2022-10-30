@@ -247,10 +247,18 @@ function onGenerateCard(data)
 							html+='<div id="collapseOne'+e.center_id+'" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">';
 									html+='<div class="row clearfix accordion-body">';
 								e.slots.forEach(function(el){
-									var eltime=el.split('-');
+									
+							
+											if(el.time){
+											
+												var eltime=el.time.split('-');
 									
 				   					 html+='<div class="slot-time"><timer>'+eltime[0]+'</timer>-<timer>'+eltime[1]+'</timer></div>'; 
-
+									
+											
+										}
+										
+									
 								});
 								html+='</div>';
 									html+='</div>';
@@ -349,7 +357,7 @@ function render(){
 	CenterCount=$('.center-details > div').length;
 	$('.center-count').text(CenterCount);
 }
-function onFilterPanelChange(){
+function onFilterPanelChange(){	
 selectedFilter=this.innerText;
 selectedFilter=selectedFilter.replace("Age","").replace("' '","").replace("+","").trim();
 render();
